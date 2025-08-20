@@ -9,7 +9,7 @@ export const initialState = {
     //upgrades
     upgrades: {
         multiplier: { level: 0, baseCost: 250 },
-        autoclick: { level: 0, baseCost: 50 },
+        autoclick: { level: 0, baseCost: 400 },
     },
 
     //animals
@@ -44,7 +44,7 @@ export function gameReducer(state, action) {
             return applyFoodWithEvolution(state, action.amount, action.notify);
         }
 
-        case actions.BUY_MELT: {
+        case actions.BUY_MULT: {
             const level = state.upgrades.multiplier.level;
             const cost = Math.floor(state.upgrades.multiplier.baseCost * Math.pow(1.55, level));
             if (state.coins < cost) return state;
@@ -54,7 +54,7 @@ export function gameReducer(state, action) {
                 perTap: state.perTap + 1,
                 upgrades: {
                     ...state.upgrades,
-                    multiplies: { ...state.upgrades.multiplier, level: level + 1 },
+                    multiplier: { ...state.upgrades.multiplier, level: level + 1 },
                 },
             };
         }
