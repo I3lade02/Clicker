@@ -1,18 +1,24 @@
-import React from 'react';
-import { View, Text } from 'react-native';
-import { ANIMALS } from '../constants/animals';
-import { colors } from '../constants/colors';
+import React from "react";
+import { View, Text } from "react-native";
+import { ANIMALS } from "../constants/animals";
+import { colors } from "../constants/colors";
 
-export default function AnimalHeader({ animalIndex }) {
-    const current = ANIMALS[animalIndex % ANIMALS.length];
-    const next = ANIMALS[(animalIndex + 1) % ANIMALS.length];
-    return (
-        <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.card, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 20 }}>
-            <Text style={{ fontSize: 36 }}>{current.emoji}</Text>
-            <View style={{ alignItems: 'center' }}>
-                <Text style={{ color: 'white', fontWeight: '800', fontSize: 18 }}>{current.name}</Text>
-                <Text style={{ color: '#94a3b8', fontSize: 12, marginTop: 2 }}> {next.emoji} {next.name}</Text>
-            </View>
+export default function AnimalHeader({ animalIndex, biomeBonus = 0 }) {
+  const current = ANIMALS[animalIndex % ANIMALS.length];
+  const next = ANIMALS[(animalIndex + 1) % ANIMALS.length];
+  return (
+    <View style={{ alignSelf: "stretch", backgroundColor: colors.card, borderRadius: 16, padding: 12 }}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 12, alignSelf: "center" }}>
+        <Text style={{ fontSize: 36 }}>{current.emoji}</Text>
+        <View style={{ alignItems: "center" }}>
+          <Text style={{ color: "white", fontWeight: "800", fontSize: 18 }}>{current.name}</Text>
+          <Text style={{ color: "#94a3b8", fontSize: 12, marginTop: 2 }}>Next: {next.emoji} {next.name}</Text>
         </View>
-    );
-}   
+      </View>
+      <View style={{ marginTop: 8, flexDirection: "row", justifyContent: "space-between" }}>
+        <Text style={{ color: colors.textDim, fontWeight: "700" }}>Biome: {current.biome}</Text>
+        <Text style={{ color: colors.textDim, fontWeight: "700" }}>Biome Bonus: +{Math.round(biomeBonus*100)}% CPS</Text>
+      </View>
+    </View>
+  );
+}
