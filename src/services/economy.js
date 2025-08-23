@@ -7,21 +7,13 @@ export const tokensForRun = (runTotalFed) =>
   Math.floor(Math.pow(Math.max(0, runTotalFed) / 10000, 0.6));
 
 export const getCurrentAnimal = (s) => ANIMALS[s.animalIndex % ANIMALS.length];
-export const getCurrentBiome  = (s) => getCurrentAnimal(s).biome;
 
-export const biomeBonus   = (s, biome) => (s.biomeBonuses?.[biome] || 0);
+// Global prestige multiplier only (biomes removed)
 export const prestigeBonus = (s) => 0.02 * (s.prestige?.upgrades?.globalFoodLevel || 0);
 export const globalMultiplier = (s) => 1 + prestigeBonus(s);
 
-export const effectivePerTap = (s) => {
-  const b = 1 + biomeBonus(s, getCurrentBiome(s));
-  return s.perTap * globalMultiplier(s) * b;
-};
-
-export const effectiveCps = (s) => {
-  const b = 1 + biomeBonus(s, getCurrentBiome(s));
-  return s.cps * globalMultiplier(s) * b;
-};
+export const effectivePerTap = (s) => s.perTap * globalMultiplier(s);
+export const effectiveCps    = (s) => s.cps * globalMultiplier(s);
 
 export const computeTapOutcome = (s, now = Date.now()) => {
   // Combo

@@ -11,5 +11,5 @@ export default function useCpsTicker(state, dispatch, actions, notify) {
       }
     }, 1000);
     return () => clearInterval(id);
-  }, [state.cps, state.upgrades, state.prestige, state.biomeBonuses, state.animalIndex]);
+  }, [state.cps, state.perTap, state.prestige]); // biomes removed
 }

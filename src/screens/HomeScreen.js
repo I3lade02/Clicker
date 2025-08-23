@@ -10,7 +10,7 @@ import StatPill from "../components/StatPill";
 import UpgradeCard from "../components/UpgradeCard";
 import FloatingText from "../components/FloatingText";
 import useCpsTicker from "../hooks/useCpsTicker";
-import { biomeBonus, getCurrentBiome, computeTapOutcome, multCost, autoCost, tokensForRun } from "../services/economy";
+import { computeTapOutcome, multCost, autoCost, tokensForRun } from "../services/economy";
 
 export default function HomeScreen() {
   const { state, dispatch, actions: A, notify } = useGame();
@@ -45,9 +45,6 @@ export default function HomeScreen() {
     },
   ];
 
-  const currentBiome = getCurrentBiome(state);
-  const biomeBonusPct = Math.round((biomeBonus(state, currentBiome) || 0) * 100);
-
   const onFeed = () => {
     const outcome = computeTapOutcome(state, Date.now());
     // floating juice
@@ -63,7 +60,7 @@ export default function HomeScreen() {
     <View style={{ flex: 1, padding: 16, backgroundColor: colors.bg }}>
       <Text style={{ fontSize: 28, fontWeight: "800", color: "white", textAlign: "center", marginTop: 4 }}>Animal Feeder+</Text>
 
-      <AnimalHeader animalIndex={state.animalIndex} biomeBonus={(biomeBonus(state, currentBiome) || 0)} />
+      <AnimalHeader animalIndex={state.animalIndex} />
 
       <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 8, marginTop: 8 }}>
         <StatPill label="Food" value={format(state.coins)} />
@@ -124,7 +121,7 @@ export default function HomeScreen() {
       </View>
 
       <Text style={{ color: "#94a3b8", textAlign: "center", marginTop: 10, fontSize: 12 }}>
-        Biome bonus in {currentBiome}: +{biomeBonusPct}% CPS · Tokens: {state.prestige.tokens}
+        Animals evolve as you feed them 🐾 • Purchases reduce progress bar
       </Text>
     </View>
   );

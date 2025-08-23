@@ -3,7 +3,7 @@ import { View, Text } from "react-native";
 import { ANIMALS } from "../constants/animals";
 import { colors } from "../constants/colors";
 
-export default function AnimalHeader({ animalIndex, biomeBonus = 0 }) {
+export default function AnimalHeader({ animalIndex }) {
   const current = ANIMALS[animalIndex % ANIMALS.length];
   const next = ANIMALS[(animalIndex + 1) % ANIMALS.length];
   return (
@@ -14,10 +14,6 @@ export default function AnimalHeader({ animalIndex, biomeBonus = 0 }) {
           <Text style={{ color: "white", fontWeight: "800", fontSize: 18 }}>{current.name}</Text>
           <Text style={{ color: "#94a3b8", fontSize: 12, marginTop: 2 }}>Next: {next.emoji} {next.name}</Text>
         </View>
-      </View>
-      <View style={{ marginTop: 8, flexDirection: "row", justifyContent: "space-between" }}>
-        <Text style={{ color: colors.textDim, fontWeight: "700" }}>Biome: {current.biome}</Text>
-        <Text style={{ color: colors.textDim, fontWeight: "700" }}>Biome Bonus: +{Math.round(biomeBonus*100)}% CPS</Text>
       </View>
     </View>
   );

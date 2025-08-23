@@ -1,17 +1,17 @@
-import React, { createContext, useContext, useEffect, useMemo, useReducer } from "react";
-import { Alert } from "react-native";
-import { actions, gameReducer, initialState } from "./gameReducer";
-import { clearState, loadState, saveState } from "../storage/persistence";
+import React, { createContext, useContext, useEffect, useMemo, useReducer } from 'react';
+import { Alert } from 'react-native';
+import { actions, gameReducer, initialState } from './gameReducer';
+import { clearState, loadState, saveState } from '../storage/persistence';
 
 const GameCtx = createContext(null);
 
 export function GameProvider({ children }) {
   const [state, dispatch] = useReducer(gameReducer, initialState);
 
-  const notify = (oldA, nextA, extra = "") => {
+  const notify = (oldA, nextA) => {
     Alert.alert(
-      "Yum! Full belly!",
-      `${oldA.emoji} ${oldA.name} is satisfied.\nSay hi to ${nextA.emoji} ${nextA.name}!${extra}`
+      "Yum full belly!",
+      `${oldA.emoji} ${oldA.name} is satisfied.\nSay hi to ${nextA.emoji} ${nextA.name}!`
     );
   };
 
@@ -25,7 +25,7 @@ export function GameProvider({ children }) {
       dispatch({ type: actions.LOAD, payload: { ...saved, lastSavedAt: now } });
       if (offlineFood > 0) {
         dispatch({ type: actions.FEED_PASSIVE, amount: offlineFood, notify });
-        Alert.alert("Welcome back!", `Your feeders added ${offlineFood} food while away.`);
+        Alert.alert("Welcome back!", `Your feeders added ${offlineFood} food while away`);
       }
     })();
   }, []);

@@ -1,4 +1,4 @@
-import { ANIMALS } from "../constants/animals";
+import { ANIMALS } from '../constants/animals';
 
 export const evolve = (state, notify) => {
   const oldAnimal = ANIMALS[state.animalIndex % ANIMALS.length];
@@ -6,24 +6,13 @@ export const evolve = (state, notify) => {
   const nextAnimal = ANIMALS[nextIdx % ANIMALS.length];
   const nextRequired = Math.floor(state.foodRequired * state.foodGrowth);
 
-  const bonuses = { ...(state.biomeBonuses || {}) };
-  if (oldAnimal.lastInBiome) {
-    const biome = oldAnimal.biome;
-    const prev = bonuses[biome] || 0;
-    bonuses[biome] = prev + 0.10; // +10% CPS in that biome
-  }
-
-  if (notify) {
-    const biomeMsg = oldAnimal.lastInBiome ? `\nBiome bonus for ${oldAnimal.biome}: +10% CPS!` : "";
-    notify(oldAnimal, nextAnimal, biomeMsg);
-  }
+  if (notify) notify(oldAnimal, nextAnimal);
 
   return {
     ...state,
     animalIndex: nextIdx,
     foodFed: 0,
     foodRequired: nextRequired,
-    biomeBonuses: bonuses,
     evolutions: (state.evolutions || 0) + 1
   };
 };

@@ -1,10 +1,3 @@
-export const BIOMES = [
-  { key: "Forest", emoji: "🌲" },
-  { key: "Arctic", emoji: "🧊" },
-  { key: "Jungle", emoji: "🌿" }
-];
-
-// Animals are ordered; lastInBiome marks biome completion thresholds.
 export const ANIMALS = [
   { name: "Bunny",   emoji: "🐰", biome: "Forest" },
   { name: "Fox",     emoji: "🦊", biome: "Forest", lastInBiome: true },
