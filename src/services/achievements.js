@@ -1,7 +1,6 @@
-// src/services/achievements.js
 import { ACHIEVEMENTS } from "../constants/achievements";
 
-// Get a numeric stat for a given achievement type.
+// --- Stat readers ---
 function getStatByType(s, type) {
   switch (type) {
     case "fed_total":     return s.lifetimeTotalFed || 0;
@@ -17,12 +16,17 @@ function getStatByType(s, type) {
   }
 }
 
-// Pure reward applier: returns a NEW state with rewards applied
+// Exported stat helper for the UI
+export function statValueFor(s, type) {
+  return getStatByType(s, type);
+}
+
+// --- Rewards ---
 function applyReward(state, reward) {
   if (!reward) return state;
   let next = { ...state };
 
-  // Ensure prestige object exists
+  // ensure prestige container
   next.prestige = next.prestige || { tokens: 0, upgrades: { globalFoodLevel: 0 } };
 
   if (reward.tokens) {
@@ -49,7 +53,7 @@ function applyReward(state, reward) {
   return next;
 }
 
-// Evaluate achievements and return a NEW state with unlocks and rewards
+// --- Evaluator ---
 export function evaluateAndApplyAchievements(prevState, currState) {
   let next = { ...currState };
   const unlocked = { ...(next.achievements?.unlocked || {}) };
