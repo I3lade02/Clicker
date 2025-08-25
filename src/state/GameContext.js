@@ -1,17 +1,22 @@
-import React, { createContext, useContext, useEffect, useMemo, useReducer } from 'react';
-import { Alert } from 'react-native';
-import { actions, gameReducer, initialState } from './gameReducer';
-import { clearState, loadState, saveState } from '../storage/persistence';
+import React, { createContext, useContext, useEffect, useMemo, useReducer } from "react";
+import { Alert, Platform } from "react-native";
+import * as Haptics from "expo-haptics";
+import { actions, gameReducer, initialState } from "./gameReducer";
+import { clearState, loadState, saveState } from "../storage/persistence";
 
 const GameCtx = createContext(null);
 
 export function GameProvider({ children }) {
   const [state, dispatch] = useReducer(gameReducer, initialState);
 
-  const notify = (oldA, nextA) => {
+  const notify = (oldA, nextA, extra = "") => {
+    // Haptic (evolution)
+    if (state.settings?.hapticsEnabled && Platform.OS !== "web") {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    }
     Alert.alert(
-      "Yum full belly!",
-      `${oldA.emoji} ${oldA.name} is satisfied.\nSay hi to ${nextA.emoji} ${nextA.name}!`
+      "Yum! Full belly!",
+      `${oldA.emoji} ${oldA.name} is satisfied.\nSay hi to ${nextA.emoji} ${nextA.name}!${extra}`
     );
   };
 
@@ -25,7 +30,7 @@ export function GameProvider({ children }) {
       dispatch({ type: actions.LOAD, payload: { ...saved, lastSavedAt: now } });
       if (offlineFood > 0) {
         dispatch({ type: actions.FEED_PASSIVE, amount: offlineFood, notify });
-        Alert.alert("Welcome back!", `Your feeders added ${offlineFood} food while away`);
+        Alert.alert("Welcome back!", `Your feeders added ${offlineFood} food while away.`);
       }
     })();
   }, []);

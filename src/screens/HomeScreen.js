@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, FlatList, TouchableOpacity, Alert } from "react-native";
+import React, { useState, useEffect, useRef } from "react";
+import { View, Text, FlatList, TouchableOpacity, Alert, Platform } from "react-native";
+import * as Haptics from "expo-haptics";
 import { useGame } from "../state/GameContext";
 import { colors } from "../constants/colors";
 import { format } from "../utils/format";
@@ -13,6 +14,8 @@ import BottomBar from "../components/BottomBar";
 import AchievementsModal from "../components/AchievementsModal";
 import InventoryModal from "../components/InventoryModal";
 import PrestigeModal from "../components/PrestigeModal";
+import ResearchModal from "../components/ResearchModal";
+import SettingsModal from "../components/SettingsModal";
 import useCpsTicker from "../hooks/useCpsTicker";
 import * as ECON from "../services/economy";
 
@@ -21,11 +24,17 @@ export default function HomeScreen() {
   useCpsTicker(state, dispatch, A, notify);
 
   const [floaters, setFloaters] = useState([]);
-
-  // Modal toggles
   const [showAch, setShowAch] = useState(false);
   const [showInv, setShowInv] = useState(false);
   const [showPrestige, setShowPrestige] = useState(false);
+  const [showResearch, setShowResearch] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+
+  // Haptics helpers
+  const hOn = state.settings?.hapticsEnabled && Platform.OS !== "web";
+  const lastTapH = useRef(0);
+  const impact = async (style) => { if (hOn) try { await Haptics.impactAsync(style); } catch {} };
+  const notifyH = async (type) => { if (hOn) try { await Haptics.notificationAsync(type); } catch {} };
 
   // Costs
   const multLevel = state.upgrades.multiplier.level;
@@ -39,7 +48,7 @@ export default function HomeScreen() {
       title: "Bigger Bite (+1 per tap)",
       description: `Increase food per tap by 1 (current: ${state.perTap})`,
       cost: multC,
-      onBuy: () => dispatch({ type: A.BUY_MULT }),
+      onBuy: async () => { await impact(Haptics.ImpactFeedbackStyle.Medium); dispatch({ type: A.BUY_MULT }); },
       affordable: state.coins >= multC,
       level: multLevel,
     },
@@ -48,14 +57,19 @@ export default function HomeScreen() {
       title: "Auto-Feeder (+1 food/s)",
       description: `Gain 1 food/sec passively (current: ${state.cps}/s)`,
       cost: autoC,
-      onBuy: () => dispatch({ type: A.BUY_AUTO }),
+      onBuy: async () => { await impact(Haptics.ImpactFeedbackStyle.Medium); dispatch({ type: A.BUY_AUTO }); },
       affordable: state.coins >= autoC,
       level: autoLevel,
     },
   ];
 
-  const onFeed = () => {
+  const onFeed = async () => {
     const outcome = ECON.computeTapOutcome(state, Date.now());
+    // haptic tier: crit = medium, normal = light (rate-limited)
+    const now = Date.now();
+    if (outcome.isCrit) await impact(Haptics.ImpactFeedbackStyle.Medium);
+    else if (now - lastTapH.current > 90) { lastTapH.current = now; await impact(Haptics.ImpactFeedbackStyle.Light); }
+
     const label = `+${format(outcome.amount)}${outcome.isCrit ? " ✨CRIT" : ""}${
       outcome.comboMul > 1 ? ` x${outcome.comboMul.toFixed(2)}` : ""
     }`;
@@ -68,10 +82,11 @@ export default function HomeScreen() {
     });
   };
 
-  // Toast for newly unlocked achievements
+  // Toast for newly unlocked achievements (+ haptic)
   useEffect(() => {
     const pending = state.achievements?.lastUnlocked || [];
     if (!pending.length) return;
+    notifyH(Haptics.NotificationFeedbackType.Success);
     const lines = pending.map((a) => `• ${a.title}`).join("\n");
     const rewards = pending
       .map((a) => {
@@ -120,6 +135,7 @@ export default function HomeScreen() {
 
       <ProgressBar fed={state.foodFed} required={state.foodRequired} />
 
+      {/* Upgrades */}
       <Text style={{ color: colors.info, fontWeight: "700", marginTop: 6, marginBottom: 4 }}>Upgrades</Text>
       <FlatList
         data={upgrades}
@@ -143,6 +159,8 @@ export default function HomeScreen() {
         onAchievements={() => setShowAch(true)}
         onInventory={() => setShowInv(true)}
         onPrestige={() => setShowPrestige(true)}
+        onResearch={() => setShowResearch(true)}
+        onSettings={() => setShowSettings(true)}
       />
 
       {/* Modals */}
@@ -152,19 +170,33 @@ export default function HomeScreen() {
         visible={showInv}
         onClose={() => setShowInv(false)}
         state={state}
-        onActivate={(kind) => dispatch({ type: A.ACTIVATE_BOOST, kind })}
+        onActivate={async (kind) => { await impact(Haptics.ImpactFeedbackStyle.Medium); dispatch({ type: A.ACTIVATE_BOOST, kind }); }}
       />
 
       <PrestigeModal
         visible={showPrestige}
         onClose={() => setShowPrestige(false)}
         state={state}
-        onSpend={() => dispatch({ type: A.BUY_PRESTIGE_UPGRADE })}
-        onPrestige={(tokens) => dispatch({ type: A.PRESTIGE, payload: { tokensEarned: tokens } })}
+        onSpend={async () => { await impact(Haptics.ImpactFeedbackStyle.Medium); dispatch({ type: A.BUY_PRESTIGE_UPGRADE }); }}
+        onPrestige={async (tokens) => { await notifyH(Haptics.NotificationFeedbackType.Success); dispatch({ type: A.PRESTIGE, payload: { tokensEarned: tokens } }); }}
         onTotalReset={() => {
           clearState?.();
           dispatch({ type: A.RESET });
         }}
+      />
+
+      <ResearchModal
+        visible={showResearch}
+        onClose={() => setShowResearch(false)}
+        state={state}
+        onBuy={async (key) => { await impact(Haptics.ImpactFeedbackStyle.Medium); dispatch({ type: A.BUY_RESEARCH, key }); }}
+      />
+
+      <SettingsModal
+        visible={showSettings}
+        onClose={() => setShowSettings(false)}
+        hapticsEnabled={state.settings?.hapticsEnabled}
+        onToggleHaptics={() => dispatch({ type: A.TOGGLE_HAPTICS })}
       />
     </View>
   );
