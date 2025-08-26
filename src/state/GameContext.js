@@ -3,6 +3,7 @@ import { Alert, Platform } from "react-native";
 import * as Haptics from "expo-haptics";
 import { actions, gameReducer, initialState } from "./gameReducer";
 import { clearState, loadState, saveState } from "../storage/persistence";
+import { SFX } from "../services/sound";
 
 const GameCtx = createContext(null);
 
@@ -10,10 +11,10 @@ export function GameProvider({ children }) {
   const [state, dispatch] = useReducer(gameReducer, initialState);
 
   const notify = (oldA, nextA, extra = "") => {
-    // Haptic (evolution)
     if (state.settings?.hapticsEnabled && Platform.OS !== "web") {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     }
+    if (state.settings?.sfxEnabled) SFX.evolve();
     Alert.alert(
       "Yum! Full belly!",
       `${oldA.emoji} ${oldA.name} is satisfied.\nSay hi to ${nextA.emoji} ${nextA.name}!${extra}`
