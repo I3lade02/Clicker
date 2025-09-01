@@ -34,7 +34,7 @@ export const initialState = {
     affixes: [], shieldOn: false, nextShieldToggleAt: 0,
   },
 
-  settings: { hapticsEnabled: true, sfxEnabled: true },
+  settings: { hapticsEnabled: true, sfxEnabled: true, sfxVolume: 1 },
 
   evolutions: 0, runTotalFed: 0, lifetimeTotalFed: 0, bestCombo: 0, lifetimeCrits: 0,
   upgradesPurchased: 0, prestiges: 0, tokensTotal: 0,
@@ -52,7 +52,7 @@ export const actions = {
   ACTIVATE_BOOST: "ACTIVATE_BOOST", TICK_BOOSTS: "TICK_BOOSTS", TOGGLE_HAPTICS: "TOGGLE_HAPTICS", TOGGLE_SFX: "TOGGLE_SFX",
   BUY_RESEARCH: "BUY_RESEARCH",
   TICK_EVENTS: "TICK_EVENTS", START_FRENZY: "START_FRENZY",
-  START_BOSS: "START_BOSS",
+  START_BOSS: "START_BOSS", SET_SFX_VOLUME: 'SET_SFX_VOLUME',
 };
 
 function pickAffixes(evolutions = 0) {
@@ -199,7 +199,10 @@ export function gameReducer(state, action) {
     }
     case actions.TOGGLE_HAPTICS: return { ...state, settings: { ...state.settings, hapticsEnabled: !state.settings?.hapticsEnabled } };
     case actions.TOGGLE_SFX:     return { ...state, settings: { ...state.settings, sfxEnabled: !state.settings?.sfxEnabled } };
-
+    case actions.SET_SFX_VOLUME: {
+      const v = Math.max(0, Math.min(1, action.value ?? 0));
+      return { ...state, settings: { ...state.settings, sfxVolume: v } };
+    }
     // Events (frenzy & boss shield cycle)
     case actions.START_FRENZY: {
       const now = Date.now(); const dur = 25_000; const nextWindow = now + (180_000 + Math.floor(Math.random() * 180_000));

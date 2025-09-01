@@ -35,7 +35,7 @@ export default function AchievementsModal({ visible, onClose, state }) {
       <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "flex-end" }}>
         <View style={{ backgroundColor: colors.card, borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 16, maxHeight: "85%" }}>
           <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-            <Text style={{ color: "white", fontWeight: "900", fontSize: 18 }}>Achievements</Text>
+            <Text style={{ color: "white", fontWeight: "900", fontSize: 18 }}>Trophies</Text>
             <TouchableOpacity onPress={onClose} style={{ paddingHorizontal: 12, paddingVertical: 6, backgroundColor: "#334155", borderRadius: 10 }}>
               <Text style={{ color: "white", fontWeight: "800" }}>Close</Text>
             </TouchableOpacity>

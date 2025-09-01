@@ -28,7 +28,7 @@ export default function BottomBar({
       }}
     >
       <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
-        <Item label="Achievements" emoji="🏆" onPress={onAchievements} />
+        <Item label="Trophies" emoji="🏆" onPress={onAchievements} />
         <Item label="Inventory"   emoji="🎒" onPress={onInventory} />
         <Item label="Prestige"    emoji="🏛️" onPress={onPrestige} />
         <Item label="Research"    emoji="🔬" onPress={onResearch} />

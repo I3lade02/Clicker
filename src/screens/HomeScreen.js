@@ -216,8 +216,10 @@ export default function HomeScreen() {
         onClose={() => setShowSettings(false)}
         hapticsEnabled={state.settings?.hapticsEnabled}
         sfxEnabled={state.settings?.sfxEnabled}
+        sfxVolume={state.settings?.sfxVolume ?? 1}
         onToggleHaptics={() => dispatch({ type: A.TOGGLE_HAPTICS })}
         onToggleSfx={() => dispatch({ type: A.TOGGLE_SFX })}
+        onChangeVolume={(v) => { dispatch({ type: A.SET_SFX_VOLUME, value: v }); SFX.setVolume(v); }}
       />
       <BossModal
         visible={state.boss.active}
