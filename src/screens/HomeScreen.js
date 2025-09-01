@@ -16,6 +16,7 @@ import InventoryModal from "../components/InventoryModal";
 import PrestigeModal from "../components/PrestigeModal";
 import ResearchModal from "../components/ResearchModal";
 import SettingsModal from "../components/SettingsModal";
+import CompendiumModal from "../components/CompendiumModal";
 import BossModal from "../components/BossModal";
 import useCpsTicker from "../hooks/useCpsTicker";
 import * as ECON from "../services/economy";
@@ -31,6 +32,7 @@ export default function HomeScreen() {
   const [showPrestige, setShowPrestige] = useState(false);
   const [showResearch, setShowResearch] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showCompendium, setShowCompendium] = useState(false);
 
   const hOn = state.settings?.hapticsEnabled && Platform.OS !== "web";
   const sOn = !!state.settings?.sfxEnabled;
@@ -184,6 +186,7 @@ export default function HomeScreen() {
         onPrestige={() => setShowPrestige(true)}
         onResearch={() => setShowResearch(true)}
         onSettings={() => setShowSettings(true)}
+        onCompendium={() => setShowCompendium(true)}
       />
 
       {/* Modals */}
@@ -220,6 +223,11 @@ export default function HomeScreen() {
         visible={state.boss.active}
         onClose={() => {}}
         boss={state.boss}
+      />
+      <CompendiumModal
+        visible={showCompendium}
+        onClose={() => setShowCompendium(false)}
+        compendium={state.compendium}
       />
     </View>
   );

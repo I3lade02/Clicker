@@ -1,44 +1,64 @@
-import React from "react";
-import { View, TouchableOpacity, Text, Platform } from "react-native";
-import { colors } from "../constants/colors";
+import React from 'react';
+import { View, TouchableOpacity, Text, Platform } from 'react-native';
+import { colors } from '../constants/colors';
 
-export default function BottomBar({ onAchievements, onInventory, onPrestige, onResearch, onSettings }) {
+export default function BottomBar({
+  onAchievements,
+  onInventory,
+  onPrestige,
+  onResearch,
+  onCompendium,
+  onSettings,
+  barColor,
+}) {
+  const bg = '#230356ff';
+
   return (
-    <View
+    <View 
       style={{
-        position: "absolute",
-        left: 16,
-        right: 16,
-        bottom: Platform.OS === "ios" ? 24 : 16,
-        backgroundColor: "#0b1220",
-        borderRadius: 16,
-        paddingHorizontal: 12,
-        paddingVertical: 10,
-        flexDirection: "row",
-        justifyContent: "space-around",
-        alignItems: "center",
-        borderWidth: 1,
-        borderColor: "#1f2937",
-        shadowColor: "#000",
-        shadowOpacity: 0.2,
-        shadowRadius: 16,
-        elevation: 6,
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: bg,
+        paddingTop: 8,
+        paddingBottom: Platform.OS === 'android' ? 18 : 12,
+        borderTopWidth: 1,
+        borderTopColor: 'rgba(255, 255, 255, 0.08)',
       }}
     >
-      <Item emoji="🏆" label="Achievements" onPress={onAchievements} />
-      <Item emoji="🎒" label="Inventory" onPress={onInventory} />
-      <Item emoji="🏛️" label="Prestige" onPress={onPrestige} />
-      <Item emoji="🔬" label="Research" onPress={onResearch} />
-      <Item emoji="⚙️" label="Settings" onPress={onSettings} />
+      <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
+        <Item label="Achievements" emoji="🏆" onPress={onAchievements} />
+        <Item label="Inventory"   emoji="🎒" onPress={onInventory} />
+        <Item label="Prestige"    emoji="🏛️" onPress={onPrestige} />
+        <Item label="Research"    emoji="🔬" onPress={onResearch} />
+        <Item label="Compendium"  emoji="📘" onPress={onCompendium} />
+        <Item label="Settings"    emoji="⚙️" onPress={onSettings} />
+      </View>
     </View>
   );
 }
 
 function Item({ emoji, label, onPress }) {
   return (
-    <TouchableOpacity onPress={onPress} style={{ alignItems: "center", padding: 6 }}>
-      <Text style={{ fontSize: 18 }}>{emoji}</Text>
-      <Text style={{ color: colors.text, fontWeight: "800", fontSize: 12 }}>{label}</Text>
+    <TouchableOpacity
+      onPress={onPress}
+      style={{ 
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 6,
+      }}
+      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+      activeOpacity={0.8}
+    >
+      <Text style={{ fontSize: 18, color: 'white' }}>{emoji}</Text>
+      <Text
+        numberOfLines={1}
+        style={{ color: 'rgba(255, 255, 255, 0.9)', fontWeight: '800', fontSize: 12, marginTop: 2 }}
+      >
+        {label}
+      </Text>
     </TouchableOpacity>
-  );
+  )
 }
