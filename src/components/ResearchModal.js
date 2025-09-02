@@ -23,9 +23,9 @@ export default function ResearchModal({ visible, onClose, state, onBuy }) {
       <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "flex-end" }}>
         <View style={{ backgroundColor: colors.card, borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 16, maxHeight: "85%" }}>
           <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-            <Text style={{ color: "white", fontWeight: "900", fontSize: 18 }}>Research</Text>
+            <Text style={{ color: colors.text, fontWeight: "900", fontSize: 18 }}>Research</Text>
             <TouchableOpacity onPress={onClose} style={{ paddingHorizontal: 12, paddingVertical: 6, backgroundColor: "#334155", borderRadius: 10 }}>
-              <Text style={{ color: "white", fontWeight: "800" }}>Close</Text>
+              <Text style={{ color: 'white', fontWeight: "800" }}>Close</Text>
             </TouchableOpacity>
           </View>
 
@@ -56,7 +56,7 @@ function Row({ node, rp, onBuy }) {
 
   return (
     <View style={{ backgroundColor: colors.surface, borderRadius: 14, padding: 12, marginBottom: 8 }}>
-      <Text style={{ color: "white", fontWeight: "800" }}>{node.title} <Text style={{ color: "#a5b4fc" }}>Lv {node.level}/{node.max}</Text></Text>
+      <Text style={{ color: colors.text, fontWeight: "800" }}>{node.title} <Text style={{ color: "#a5b4fc" }}>Lv {node.level}/{node.max}</Text></Text>
       <Text style={{ color: colors.textDim, marginTop: 2 }}>{node.desc}</Text>
       <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 8 }}>
         <Text style={{ color: colors.textDim }}>Cost: {cost} RP</Text>
@@ -65,7 +65,7 @@ function Row({ node, rp, onBuy }) {
           onPress={() => onBuy(node.key)}
           style={{ backgroundColor: can ? colors.primary : "#475569", paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10 }}
         >
-          <Text style={{ color: "white", fontWeight: "800" }}>{can ? "Buy" : atCap ? "Maxed" : "Need RP"}</Text>
+          <Text style={{ color: 'white', fontWeight: "800" }}>{can ? "Buy" : atCap ? "Maxed" : "Need RP"}</Text>
         </TouchableOpacity>
       </View>
     </View>

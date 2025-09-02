@@ -36,7 +36,7 @@ export default function PrestigeModal({ visible, onClose, state, onSpend, onPres
 
               <TouchableOpacity
                 onPress={() => onPrestige(projected)}
-                style={{ backgroundColor: colors.warning, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10 }}
+                style={{ backgroundColor: colors.primary, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10 }}
               >
                 <Text style={{ color: "white", fontWeight: "800" }}>Prestige Now</Text>
               </TouchableOpacity>

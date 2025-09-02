@@ -2,17 +2,6 @@ import React, { useState } from "react";
 import { Modal, View, Text, TouchableOpacity, Platform } from "react-native";
 import { colors } from "../constants/colors";
 
-/**
- * Props:
- * - visible, onClose
- * - hapticsEnabled, onToggleHaptics
- * - sfxEnabled, onToggleSfx
- * - sfxVolume (0..1), onChangeVolume(v)
- * - hapticsProfile ("subtle" | "default" | "arcade"), onSetHapticsProfile(p)
- * - lowMotion, colorblindSafe, largeTapTarget
- * - onToggleLowMotion, onToggleColorblind, onToggleLargeTap
- * - onExportSave, onImportSave
- */
 export default function SettingsModal(props) {
   const hSupported = Platform.OS !== "web";
   return (
@@ -20,6 +9,30 @@ export default function SettingsModal(props) {
       <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "flex-end" }}>
         <View style={{ backgroundColor: colors.card, borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 16 }}>
           <Header onClose={props.onClose} />
+
+          {/* Theme */}
+          <View style={{ backgroundColor: colors.surface, borderRadius: 14, padding: 12, marginBottom: 8 }}>
+            <Text style={{ color: 'white', fontWeight: '800' }}>Theme</Text>
+            <Text style={{ color: colors.textDim, marginTop: 2 }}>Switch between Dark and Lo-fi themes</Text>
+            <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
+              {['dark', 'lofi'].map((t) => (
+                <TouchableOpacity
+                  key={t}
+                  onPress={() => props.onSetTheme?.(t)}
+                  style={{
+                    paddingHorizontal: 10,
+                    paddingVertical: 6,
+                    borderRadius: 10,
+                    backgroundColor: props.theme === t ? colors.primary : '#334155',
+                  }}
+                >
+                  <Text style={{ color: 'white', fontWeight: '800', textTransform: 'capitalize' }}>
+                    {t === 'lofi' ? 'Lo-fi' : t}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
 
           {/* Sound effects */}
           <Row>

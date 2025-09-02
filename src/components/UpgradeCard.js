@@ -15,7 +15,7 @@ export default function UpgradeCard({ title, description, level, cost, affordabl
   return (
     <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: colors.surface, borderRadius: 16, padding: 12, gap: 12 }}>
       <View style={{ flex: 1 }}>
-        <Text style={{ color: "white", fontWeight: "800" }}>
+        <Text style={{ color: colors.text, fontWeight: "800" }}>
           {title} <Text style={{ color: colors.lilac, fontWeight: "700", fontSize: 12 }}>Lv {level}</Text>
         </Text>
         <Text style={{ color: colors.textDim, marginTop: 2 }}>{description}</Text>

@@ -12,7 +12,7 @@ export default function BottomBar({
   onSettings,
   barColor,
 }) {
-  const bg = "#230356ff";
+  const bg = colors.bg;
 
   return (
     <View style={{ position: "absolute", left: 0, right: 0, bottom: 0, backgroundColor: bg, paddingTop: 8, paddingBottom: 12, borderTopWidth: 1, borderTopColor: "rgba(255,255,255,0.08)" }}>
@@ -32,8 +32,8 @@ export default function BottomBar({
 function Item({ emoji, label, onPress }) {
   return (
     <TouchableOpacity onPress={onPress} style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingVertical: 6 }} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }} activeOpacity={0.8}>
-      <Text style={{ fontSize: 18, color: "white" }}>{emoji}</Text>
-      <Text numberOfLines={1} style={{ color: "rgba(255,255,255,0.9)", fontWeight: "800", fontSize: 12, marginTop: 2 }}>
+      <Text style={{ fontSize: 18, color: 'white' }}>{emoji}</Text>
+      <Text numberOfLines={1} style={{ color: colors.text, fontWeight: "800", fontSize: 12, marginTop: 2 }}>
         {label}
       </Text>
     </TouchableOpacity>

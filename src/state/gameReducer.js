@@ -81,6 +81,7 @@ export const initialState = {
     colorblindSafe: false,
     largeTapTarget: false,
     hapticsProfile: 'default', //'subtle' || 'default' || 'arcade'
+    theme: 'dark', //'dark' || 'light' || 'lofi'
   },
 
   //stats
@@ -116,6 +117,7 @@ export const actions = {
   TOGGLE_HAPTICS: 'TOGGLE_HAPTICS',
   TOGGLE_SFX: 'TOGGLE_SFX',
   SET_SFX_VOLUME: 'SET_SFX_VOLUME',
+  SET_THEME: 'SET_THEME',
 
   //research
   BUY_RESEARCH: 'BUY_RESEARCH',
@@ -403,6 +405,12 @@ export function gameReducer(state, action) {
     case actions.SET_SFX_VOLUME: {
       const v = Math.max(0, Math.min(1, action.value ?? 0));
       return { ...state, settings: { ...state.settings, sfxVolume: v } };
+    }
+
+    case actions.SET_THEME: {
+      const t = action.value;
+      if (!['dark', 'light', 'lofi'].includes(t)) return state;
+      return { ...state, settings: { ...state.settings, theme: t } };
     }
 
     // ---- Events

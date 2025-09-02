@@ -14,7 +14,7 @@ export default function BigButton({ label = "FEED", onPress, glow = 0 }) {
     <Animated.View style={{ transform: [{ scale }], marginVertical: 12 }}>
       <TouchableOpacity
         style={{
-          backgroundColor: colors.accent,
+          backgroundColor: colors.button,
           borderRadius: 9999,
           paddingVertical: 28,
           alignItems: "center",

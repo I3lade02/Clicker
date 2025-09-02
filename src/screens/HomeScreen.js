@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { View, Text, FlatList, TouchableOpacity, Alert, Platform } from "react-native";
 import * as Haptics from "expo-haptics";
 import { useGame } from "../state/GameContext";
-import { colors } from "../constants/colors";
+import { colors, setTheme } from "../constants/colors";
 import { format } from "../utils/format";
 import AnimalHeader from "../components/AnimalHeader";
 import BigButton from "../components/BigButton";
@@ -25,6 +25,7 @@ import * as ECON from "../services/economy";
 import { SFX } from "../services/sound";
 import { exportSave, importSave } from "../services/cloud";
 import { saveState } from "../storage/persistence";
+import { StatusBar } from "expo-status-bar";
 
 export default function HomeScreen() {
   const { state, dispatch, actions: A, notify, clearState } = useGame();
@@ -152,11 +153,18 @@ export default function HomeScreen() {
     prevBossActive.current = active;
   }, [state.boss.active, state.boss.lastOutcome]);
 
+  //Apply theme from settings
+  useEffect(() => {
+    const t = state.settings?.theme || 'dark';
+    setTheme(t);
+  }, [state.settings?.theme]);
+
   const frenzyActive = (state.events?.frenzyUntil || 0) > Date.now();
 
   return (
     <View style={{ flex: 1, padding: 16, paddingBottom: 110, backgroundColor: colors.bg }}>
-      <Text style={{ fontSize: 28, fontWeight: "800", color: "white", textAlign: "center", marginTop: 30 }}>
+      <StatusBar style={state.setting?.theme === 'lofi' ? 'dark' : 'lofi'} />
+      <Text style={{ fontSize: 28, fontWeight: "800", color: colors.text, textAlign: "center", marginTop: 30 }}>
         Animal Feeder+
       </Text>
 
@@ -263,6 +271,8 @@ export default function HomeScreen() {
             }
           }
         }}
+        theme={state.settings?.theme || 'dark' }
+        onSetTheme={(t) => dispatch({ type: A.SET_THEME, value: t})}
       />
       <CompendiumModal visible={showCompendium} onClose={() => setShowCompendium(false)} compendium={state.compendium} />
       <ArtifactsModal
