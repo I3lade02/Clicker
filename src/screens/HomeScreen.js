@@ -16,11 +16,15 @@ import InventoryModal from "../components/InventoryModal";
 import PrestigeModal from "../components/PrestigeModal";
 import ResearchModal from "../components/ResearchModal";
 import SettingsModal from "../components/SettingsModal";
-import CompendiumModal from "../components/CompendiumModal";
 import BossModal from "../components/BossModal";
+import CompendiumModal from "../components/CompendiumModal";
+import ArtifactsModal from "../components/ArtifactsModal";
+import TutorialModal from "../components/TutorialModal";
 import useCpsTicker from "../hooks/useCpsTicker";
 import * as ECON from "../services/economy";
 import { SFX } from "../services/sound";
+import { exportSave, importSave } from "../services/cloud";
+import { saveState } from "../storage/persistence";
 
 export default function HomeScreen() {
   const { state, dispatch, actions: A, notify, clearState } = useGame();
@@ -33,7 +37,14 @@ export default function HomeScreen() {
   const [showResearch, setShowResearch] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showCompendium, setShowCompendium] = useState(false);
+  const [showArtifacts, setShowArtifacts] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
 
+  useEffect(() => {
+    if (!state.settings?.seenTutorial) setShowTutorial(true);
+  }, []);
+
+  // Haptics helpers
   const hOn = state.settings?.hapticsEnabled && Platform.OS !== "web";
   const sOn = !!state.settings?.sfxEnabled;
   const lastTapH = useRef(0);
@@ -70,13 +81,25 @@ export default function HomeScreen() {
   const onFeed = async () => {
     const outcome = ECON.computeTapOutcome(state, Date.now());
     if (sOn) (outcome.isCrit ? SFX.crit() : SFX.tap());
-    const now = Date.now();
-    if (outcome.isCrit) await impact(Haptics.ImpactFeedbackStyle.Medium);
-    else if (now - lastTapH.current > 90) { lastTapH.current = now; await impact(Haptics.ImpactFeedbackStyle.Light); }
+    // haptics profile map
+    const profile = state.settings?.hapticsProfile || "default";
+    const light = profile === "subtle" ? Haptics.ImpactFeedbackStyle.Light
+                : profile === "arcade" ? Haptics.ImpactFeedbackStyle.Medium
+                : Haptics.ImpactFeedbackStyle.Light;
+    const medium = profile === "subtle" ? Haptics.ImpactFeedbackStyle.Light
+                 : profile === "arcade" ? Haptics.ImpactFeedbackStyle.Heavy
+                 : Haptics.ImpactFeedbackStyle.Medium;
 
-    const label = `+${format(outcome.amount)}${outcome.isCrit ? " ✨CRIT" : ""}${outcome.comboMul > 1 ? ` x${outcome.comboMul.toFixed(2)}` : ""}`;
+    const now = Date.now();
+    if (outcome.isCrit) await impact(medium);
+    else if (now - lastTapH.current > 90) { lastTapH.current = now; await impact(light); }
+
+    const critCue = outcome.isCrit ? (state.settings?.colorblindSafe ? " ⭐CRIT" : " ✨CRIT") : "";
+    const label = `+${format(outcome.amount)}${critCue}${outcome.comboMul > 1 ? ` x${outcome.comboMul.toFixed(2)}` : ""}`;
     const id = Math.random().toString(36).slice(2);
-    setFloaters((arr) => [...arr, { id, label }]);
+    if (!state.settings?.lowMotion) {
+      setFloaters((arr) => [...arr, { id, label }]);
+    }
     dispatch({
       type: A.FEED_TAP,
       payload: { amount: outcome.amount, nextCombo: outcome.nextCombo, isCrit: outcome.isCrit },
@@ -132,7 +155,7 @@ export default function HomeScreen() {
   const frenzyActive = (state.events?.frenzyUntil || 0) > Date.now();
 
   return (
-    <View style={{ flex: 1, padding: 16, paddingBottom: 100, backgroundColor: colors.bg }}>
+    <View style={{ flex: 1, padding: 16, paddingBottom: 110, backgroundColor: colors.bg }}>
       <Text style={{ fontSize: 28, fontWeight: "800", color: "white", textAlign: "center", marginTop: 30 }}>
         Animal Feeder+
       </Text>
@@ -151,30 +174,28 @@ export default function HomeScreen() {
         <StatPill label="/s" value={state.cps} />
       </View>
 
-      {/* Floating juice overlay */}
-      <View style={{ height: 0, alignItems: "center" }}>
-        {floaters.map((f) => (
-          <FloatingText key={f.id} id={f.id} text={f.label} onDone={(id) => setFloaters((arr) => arr.filter((x) => x.id !== id))} />
-        ))}
-      </View>
+      {/* Floating numbers (respect Low Motion) */}
+      {!state.settings?.lowMotion && (
+        <View style={{ height: 0, alignItems: "center" }}>
+          {floaters.map((f) => (
+            <FloatingText key={f.id} id={f.id} text={f.label} onDone={(id) => setFloaters((arr) => arr.filter((x) => x.id !== id))} />
+          ))}
+        </View>
+      )}
 
-      <BigButton glow={state.foodRequired > 0 ? (state.foodFed / state.foodRequired > 0.95 ? 1 : 0) : 0} onPress={onFeed} />
+      {/* Large tap target */}
+      <View style={{ transform: [{ scale: state.settings?.largeTapTarget ? 1.2 : 1 }] }}>
+        <BigButton glow={state.foodRequired > 0 ? (state.foodFed / state.foodRequired > 0.95 ? 1 : 0) : 0} onPress={onFeed} />
+      </View>
 
       <ProgressBar fed={state.foodFed} required={state.foodRequired} />
 
       <Text style={{ color: colors.info, fontWeight: "700", marginTop: 6, marginBottom: 4 }}>Upgrades</Text>
       <FlatList
-        data={ [ ...upgrades ] }
+        data={[...upgrades]}
         keyExtractor={(i) => i.key}
         renderItem={({ item }) => (
-          <UpgradeCard
-            title={item.title}
-            description={item.description}
-            level={item.level}
-            cost={item.cost}
-            affordable={item.affordable}
-            onBuy={item.onBuy}
-          />
+          <UpgradeCard title={item.title} description={item.description} level={item.level} cost={item.cost} affordable={item.affordable} onBuy={item.onBuy} />
         )}
         ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
         contentContainerStyle={{ paddingBottom: 24 }}
@@ -185,8 +206,9 @@ export default function HomeScreen() {
         onInventory={() => setShowInv(true)}
         onPrestige={() => setShowPrestige(true)}
         onResearch={() => setShowResearch(true)}
-        onSettings={() => setShowSettings(true)}
         onCompendium={() => setShowCompendium(true)}
+        onArtifacts={() => setShowArtifacts(true)}
+        onSettings={() => setShowSettings(true)}
       />
 
       {/* Modals */}
@@ -195,21 +217,21 @@ export default function HomeScreen() {
         visible={showInv}
         onClose={() => setShowInv(false)}
         state={state}
-        onActivate={async (kind) => { if (sOn) SFX.tap(); await impact(Haptics.ImpactFeedbackStyle.Medium); dispatch({ type: A.ACTIVATE_BOOST, kind }); }}
+        onActivate={async (kind) => { if (sOn) SFX.tap(); await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); dispatch({ type: A.ACTIVATE_BOOST, kind }); }}
       />
       <PrestigeModal
         visible={showPrestige}
         onClose={() => setShowPrestige(false)}
         state={state}
-        onSpend={async () => { if (sOn) SFX.purchase(); await impact(Haptics.ImpactFeedbackStyle.Medium); dispatch({ type: A.BUY_PRESTIGE_UPGRADE }); }}
-        onPrestige={async (tokens) => { await notifyH(Haptics.NotificationFeedbackType.Success); dispatch({ type: A.PRESTIGE, payload: { tokensEarned: tokens } }); }}
+        onSpend={async () => { if (sOn) SFX.purchase(); await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); dispatch({ type: A.BUY_PRESTIGE_UPGRADE }); }}
+        onPrestige={async (tokens) => { await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success); dispatch({ type: A.PRESTIGE, payload: { tokensEarned: tokens } }); }}
         onTotalReset={() => { clearState?.(); dispatch({ type: A.RESET }); }}
       />
       <ResearchModal
         visible={showResearch}
         onClose={() => setShowResearch(false)}
         state={state}
-        onBuy={async (key) => { if (sOn) SFX.purchase(); await impact(Haptics.ImpactFeedbackStyle.Medium); dispatch({ type: A.BUY_RESEARCH, key }); }}
+        onBuy={async (key) => { if (sOn) SFX.purchase(); await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); dispatch({ type: A.BUY_RESEARCH, key }); }}
       />
       <SettingsModal
         visible={showSettings}
@@ -220,16 +242,42 @@ export default function HomeScreen() {
         onToggleHaptics={() => dispatch({ type: A.TOGGLE_HAPTICS })}
         onToggleSfx={() => dispatch({ type: A.TOGGLE_SFX })}
         onChangeVolume={(v) => { dispatch({ type: A.SET_SFX_VOLUME, value: v }); SFX.setVolume(v); }}
+        hapticsProfile={state.settings?.hapticsProfile || "default"}
+        onSetHapticsProfile={(p) => dispatch({ type: A.LOAD, payload: { settings: { ...state.settings, hapticsProfile: p } } })}
+        lowMotion={!!state.settings?.lowMotion}
+        colorblindSafe={!!state.settings?.colorblindSafe}
+        largeTapTarget={!!state.settings?.largeTapTarget}
+        onToggleLowMotion={() => dispatch({ type: A.LOAD, payload: { settings: { ...state.settings, lowMotion: !state.settings?.lowMotion } } })}
+        onToggleColorblind={() => dispatch({ type: A.LOAD, payload: { settings: { ...state.settings, colorblindSafe: !state.settings?.colorblindSafe } } })}
+        onToggleLargeTap={() => dispatch({ type: A.LOAD, payload: { settings: { ...state.settings, largeTapTarget: !state.settings?.largeTapTarget } } })}
+        onExportSave={async () => { await exportSave(state); }}
+        onImportSave={async () => {
+          const obj = await importSave();
+          if (obj) {
+            if (typeof obj === "object" && obj.coins !== undefined && obj.perTap !== undefined) {
+              dispatch({ type: A.LOAD, payload: obj });
+              await saveState(obj);
+              Alert.alert("Import complete", "Your save has been loaded.");
+            } else {
+              Alert.alert("Import failed", "This file does not look like a valid save.");
+            }
+          }
+        }}
       />
-      <BossModal
-        visible={state.boss.active}
-        onClose={() => {}}
-        boss={state.boss}
+      <CompendiumModal visible={showCompendium} onClose={() => setShowCompendium(false)} compendium={state.compendium} />
+      <ArtifactsModal
+        visible={showArtifacts}
+        onClose={() => setShowArtifacts(false)}
+        bag={state.artifacts?.bag}
+        equipped={state.artifacts?.equipped}
+        onEquip={(id) => dispatch({ type: A.EQUIP_ARTIFACT, id })}
+        onUnequip={(slot) => dispatch({ type: A.UNEQUIP_ARTIFACT, slot })}
       />
-      <CompendiumModal
-        visible={showCompendium}
-        onClose={() => setShowCompendium(false)}
-        compendium={state.compendium}
+      <BossModal visible={state.boss.active} onClose={() => {}} boss={state.boss} />
+      <TutorialModal
+        visible={showTutorial}
+        onClose={() => setShowTutorial(false)}
+        onFinish={() => dispatch({ type: A.LOAD, payload: { settings: { ...state.settings, seenTutorial: true } } })}
       />
     </View>
   );

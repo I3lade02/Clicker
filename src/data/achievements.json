@@ -1,0 +1,22 @@
+[
+    { "key": "first_feed", "title": "Snack time", "desc": "Feed any amount of food", "type": "fed_total", "threshold": 1, "reward": { "boosts": { "doubleBite": 1 } } },
+    { "key": "feeder_1k", "title": "Snack packer", "desc": "Feed 1,000 total food", "type": "fed_total", "threshold": 1000, "reward": { "tokens": 1 } },
+    { "key": "feeder_10k", "title": "Hungry helper", "desc": "Feed 10, 000 total food", "type": "fed_total", "threshold": 10000, "reward": { "tokens": 1 } },
+    { "key": "feeder_100k", "title": "Canteen captain", "desc": "Feed 100, 000 total food", "type": "fed_total", "threshold": 100000, "reward": { "tokens": 1, "boosts": { "turboFeeder": 1 } } },
+
+    { "key": "evolve_1", "title": "New friend", "desc": "Evolve to your second pet", "type": "evolutions", "threshold": 1, "reward": { "tokens": 1 } },
+    { "key": "evolve_5", "title": "Caretaker", "desc": "Evolve 5 times", "type": "evolutions", "threshold": 5, "reward": { "tokens": 2 } },
+    { "key": "evolve_20", "title": "Sanctuary guide", "desc": "Evolve 20 times", "type": "evolutions", "threshold": 20, "reward": { "tokens": 3 } },
+
+    { "key": "first_auto", "title": "Hands free", "desc": "Buy your first auto-feeder", "type": "auto-level", "threshold": 1, "reward": { "boosts": { "turboFeeder": 1 } } },
+    { "key": "perTap_10", "title": "Bite sized buff", "desc": "Reach 10 food per tap", "type": "per_tap", "threshold": 10, "reward": { "tokens": 1 } },
+    { "key": "cps_10", "title": "Steady stream", "desc": "Reach 10 food per second", "type": "cps", "threshold": 10, "reward": { "tokens": 1 } },
+    
+    { "key": "combo_5", "title": "In the groove", "desc": "Hit a 5-step tap combo", "type": "best_combo", "threshold": 5, "reward": { "boosts": { "doubleBite": 1 } } },
+    { "key": "combo_10", "title": "Blazing fingers", "desc": "Hit a 10-step tap combo", "type": "best_combo", "threshold": 10, "reward": { "tokens": 1 } },
+    { "key": "crit_1", "title": "Big bite", "desc": "Land your first crit", "type": "crits", "threshold": 1, "reward": { "boosts": { "doubleBite": 1 } } },
+    { "key": "crits_25", "title": "Sharptooth", "desc": "Land 25 crits total", "type": "crits", "threshold": 25, "reward": { "tokens": 2 } },
+    
+    { "key": "prestige_1", "title": "Fresh start", "desc": "Perform your first Prestige", "type": "prestiges", "threshold": 1, "reward": { "tokens": 3 } },
+    { "key": "tokens_10", "title": "Patron", "desc": "Accumulate 10 tokens total", "type": "tokens_total", "threshold": 10, "reward": { "tokens": 2 } }
+]

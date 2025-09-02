@@ -44,7 +44,7 @@ export const ARTIFACTS = {
     },
 };
 
-export const ARTIFACTS_IDS = Object.keys(ARTIFACTS);
+export const ARTIFACT_IDS = Object.keys(ARTIFACTS);
 
 export function summarizeArtifacts(equiped = []) {
     const sum = { flatTap: 0, critChance: 0, comboStep: 0, cpsMult: 0, frenzyMult: 0, bossHpMinus: 0 };
